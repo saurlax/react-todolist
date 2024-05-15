@@ -1,19 +1,20 @@
 import { Button, Checkbox, DatePicker, Input, List, message } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import './TodoList.css'
 import { DeleteOutlined } from '@ant-design/icons'
+import dayjs from 'dayjs'
+import './TodoList.css'
 
 interface Todo {
   name: string
-  deadline: Date
+  deadline: string
   completed: boolean
 }
 
 function TodoList () {
   const [todos, setTodos] = useState<Todo[]>()
   const [name, setName] = useState('')
-  const [deadline, setDeadline] = useState<Date>()
+  const [deadline, setDeadline] = useState<string>()
   const [messageApi, contextHolder] = message.useMessage()
 
   useEffect(() => {
@@ -26,7 +27,6 @@ function TodoList () {
   }, [])
 
   useEffect(() => {
-    console.log(todos)
     if (todos) {
       localStorage.setItem('todos', JSON.stringify(todos))
     }
@@ -36,6 +36,8 @@ function TodoList () {
     if (todos) {
       if (deadline && name !== '') {
         setTodos([...todos, { name, deadline, completed: false }])
+        setName('')
+        setDeadline(undefined)
       } else {
         messageApi.error('请填写任务名称和截止时间')
       }
@@ -69,7 +71,13 @@ function TodoList () {
           value={name}
           onChange={e => setName(e.target.value)}
         />
-        <DatePicker placeholder='选择截止时间' onChange={setDeadline} />
+        <DatePicker
+          placeholder='选择截止时间'
+          value={deadline ? dayjs(deadline) : null}
+          onChange={date => {
+            setDeadline(date?.toISOString())
+          }}
+        />
         <Button type='primary' onClick={addTodo}>
           添加
         </Button>
@@ -91,7 +99,11 @@ function TodoList () {
               />
             ]}
           >
-            <div className='todo'>
+            <div
+              className={`todo ${todo.completed ? 'completed' : ''} ${
+                new Date(todo.deadline) < new Date() ? 'overdue' : ''
+              }`}
+            >
               <div>{todo.name}</div>
               <div>截止时间：{moment(todo.deadline).format('YYYY-MM-DD')}</div>
             </div>

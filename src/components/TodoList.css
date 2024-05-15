@@ -10,3 +10,11 @@
   margin: 10px 0;
   font-size: 0.9rem;
 }
+
+.todo.completed {
+  text-decoration: line-through;
+}
+
+.todo.overdue {
+  color: red;
+}
