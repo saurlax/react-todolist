@@ -1,0 +1,12 @@
+.todolist {
+  margin: 20px;
+}
+
+.todolist h1 {
+  text-align: center;
+}
+
+.todo {
+  margin: 10px 0;
+  font-size: 0.9rem;
+}

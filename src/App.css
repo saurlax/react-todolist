@@ -1,5 +1,7 @@
 .app {
-  margin: 40px 0;
+  margin: auto;
+  width: min(400px, 100vw);
   display: flex;
-  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
