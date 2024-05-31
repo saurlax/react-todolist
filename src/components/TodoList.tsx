@@ -1,5 +1,4 @@
 import { Button, Checkbox, DatePicker, Input, List, message } from 'antd'
-import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
@@ -7,14 +6,14 @@ import './TodoList.css'
 
 interface Todo {
   name: string
-  deadline: string
+  deadline: number
   completed: boolean
 }
 
 function TodoList () {
   const [todos, setTodos] = useState<Todo[]>()
   const [name, setName] = useState('')
-  const [deadline, setDeadline] = useState<string>()
+  const [deadline, setDeadline] = useState<number>()
   const [messageApi, contextHolder] = message.useMessage()
 
   useEffect(() => {
@@ -75,7 +74,7 @@ function TodoList () {
           placeholder='选择截止时间'
           value={deadline ? dayjs(deadline) : null}
           onChange={date => {
-            setDeadline(date?.toISOString())
+            setDeadline(date?.valueOf())
           }}
         />
         <Button type='primary' onClick={addTodo}>
@@ -105,7 +104,7 @@ function TodoList () {
               }`}
             >
               <div>{todo.name}</div>
-              <div>截止时间：{moment(todo.deadline).format('YYYY-MM-DD')}</div>
+              <div>截止时间：{dayjs(todo.deadline).format('YYYY-MM-DD')}</div>
             </div>
           </List.Item>
         )}
