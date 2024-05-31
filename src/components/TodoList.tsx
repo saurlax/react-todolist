@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import './TodoList.css'
 
 interface Todo {
+  id: number
   name: string
   deadline: number
   completed: boolean
@@ -34,7 +35,10 @@ function TodoList () {
   const addTodo = () => {
     if (todos) {
       if (deadline && name !== '') {
-        setTodos([...todos, { name, deadline, completed: false }])
+        setTodos([
+          ...todos,
+          { id: Date.now(), name, deadline, completed: false }
+        ])
         setName('')
         setDeadline(undefined)
       } else {
@@ -43,17 +47,17 @@ function TodoList () {
     }
   }
 
-  const deleteTodo = (name: string) => {
+  const deleteTodo = (id: number) => {
     if (todos) {
-      const newTodos = todos.filter(todo => todo.name !== name)
+      const newTodos = todos.filter(todo => todo.id !== id)
       setTodos(newTodos)
     }
   }
 
-  const editTodo = (name: string, completed: boolean) => {
+  const editTodo = (id: number, completed: boolean) => {
     if (todos) {
       const newTodos = todos.map(todo => {
-        if (todo.name === name) todo.completed = completed
+        if (todo.id === id) todo.completed = completed
         return todo
       })
       setTodos(newTodos)
@@ -88,12 +92,12 @@ function TodoList () {
             actions={[
               <Checkbox
                 onChange={e => {
-                  editTodo(todo.name, e.target.checked)
+                  editTodo(todo.id, e.target.checked)
                 }}
               />,
               <DeleteOutlined
                 onClick={() => {
-                  deleteTodo(todo.name)
+                  deleteTodo(todo.id)
                 }}
               />
             ]}
