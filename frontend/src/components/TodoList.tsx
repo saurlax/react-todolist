@@ -3,28 +3,14 @@ import { useEffect, useState } from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import './TodoList.css'
-
-interface Todo {
-  id: number
-  name: string
-  deadline: number
-  completed: boolean
-}
+import { useGlobalState } from '../global'
 
 function TodoList () {
-  const [todos, setTodos] = useState<Todo[]>()
   const [name, setName] = useState('')
   const [deadline, setDeadline] = useState<number>()
   const [messageApi, contextHolder] = message.useMessage()
 
-  useEffect(() => {
-    const storage = localStorage.getItem('todos')
-    if (storage) {
-      setTodos(JSON.parse(storage))
-    } else {
-      setTodos([])
-    }
-  }, [])
+  const { todos, setTodos } = useGlobalState()
 
   useEffect(() => {
     if (todos) {
