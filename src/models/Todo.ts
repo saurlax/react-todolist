@@ -1,9 +1,10 @@
-import { Schema, model } from 'mongoose'
+import { Schema, Types, model } from 'mongoose'
 
 interface ITodo {
   name: string,
   deadline: number,
-  completed: boolean
+  completed: boolean,
+  owner: Types.ObjectId,
 }
 
 const Todo = model<ITodo>('Todo', new Schema<ITodo>({
