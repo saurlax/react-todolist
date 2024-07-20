@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react'
 
 interface User {
   username: string
-  password: string
+  token: string
 }
 
 interface Todo {
@@ -22,7 +22,9 @@ interface GlobalState {
 const GlobalStateContext = createContext<GlobalState | undefined>(undefined)
 
 export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(
+    JSON.parse(localStorage.getItem('user') || 'null')
+  )
   const [todos, setTodos] = useState<Todo[]>([])
 
   return (

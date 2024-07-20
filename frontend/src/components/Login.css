@@ -1,0 +1,17 @@
+.login {
+  margin: 20px;
+}
+
+.login h1 {
+  text-align: center;
+}
+
+.action {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action button {
+  flex-grow: 1;
+}
