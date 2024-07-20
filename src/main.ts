@@ -34,7 +34,7 @@ app.post('/api/login', (req: Request, res: Response) => {
       const token = jwt.sign({ username: user.username }, secret, { expiresIn: '1h' })
       res.json({ token })
     } else {
-      res.sendStatus(401)
+      res.status(401).send('Username or password is incorrect')
     }
   }).catch(_ => {
     res.sendStatus(500)
@@ -43,8 +43,16 @@ app.post('/api/login', (req: Request, res: Response) => {
 
 app.post('/api/register', (req: Request, res: Response) => {
   const { username, password } = req.body
-  User.create({ username, password }).then(_ => {
-    res.sendStatus(201)
+  User.findOne({ username }).then(user => {
+    if (user) {
+      res.status(409).send('Username already exists')
+    } else {
+      User.create({ username, password }).then(_ => {
+        res.sendStatus(201)
+      }).catch(_ => {
+        res.sendStatus(500)
+      })
+    }
   }).catch(_ => {
     res.sendStatus(500)
   })
