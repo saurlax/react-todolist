@@ -2,16 +2,14 @@ import { Button, Input, message } from 'antd'
 import axios from 'axios'
 import { useState } from 'react'
 import crypto from 'crypto-js'
-import { useGlobalState } from '../global'
 import { useNavigate } from 'react-router-dom'
 import './Login.css'
 
-function Login () {
+function Login() {
   const navigate = useNavigate()
   const [messageApi, contextHolder] = message.useMessage()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const { setUser } = useGlobalState()
 
   const loginUser = () => {
     const payload = {
@@ -21,7 +19,7 @@ function Login () {
     axios
       .post('/api/login', payload)
       .then(res => {
-        setUser({ username, token: res.data.token })
+        localStorage.setItem('token', res.data.token)
         navigate('/')
       })
       .catch(err => {

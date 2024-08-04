@@ -11,6 +11,7 @@ const Todo = model<ITodo>('Todo', new Schema<ITodo>({
   name: { type: String, required: true },
   deadline: { type: Number, required: true },
   completed: { type: Boolean, required: true },
+  owner: { type: Schema.Types.ObjectId, required: true },
 }))
 
 export default Todo

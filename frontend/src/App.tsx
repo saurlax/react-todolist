@@ -1,21 +1,15 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import { useGlobalState } from './global'
 import { useEffect } from 'react'
 import './App.css'
 
-function App () {
+function App() {
   const navigate = useNavigate()
-  const { user } = useGlobalState()
 
   useEffect(() => {
-    if (!user) {
+    if (!localStorage.getItem('token')) {
       navigate('/login')
     }
   }, [])
-
-  useEffect(() => {
-    localStorage.setItem('user', JSON.stringify(user))
-  }, [user])
 
   return (
     <div className='app'>

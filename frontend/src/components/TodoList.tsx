@@ -3,50 +3,93 @@ import { useEffect, useState } from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import './TodoList.css'
-import { useGlobalState } from '../global'
+import axios from 'axios'
 
-function TodoList () {
+interface Todo {
+  id: string
+  name: string
+  deadline: number
+  completed: boolean
+}
+
+function TodoList() {
   const [name, setName] = useState('')
   const [deadline, setDeadline] = useState<number>()
+  const [todos, setTodos] = useState<Todo[]>([])
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { todos, setTodos } = useGlobalState()
-
   useEffect(() => {
-    if (todos) {
-      localStorage.setItem('todos', JSON.stringify(todos))
-    }
-  }, [todos])
+    axios.get('/api/todos', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    }).then(res => {
+      setTodos(res.data)
+    }).catch(err => {
+      messageApi.error(err.response.data.message)
+    })
+  }, [])
 
   const addTodo = () => {
     if (todos) {
       if (deadline && name !== '') {
-        setTodos([
-          ...todos,
-          { id: Date.now(), name, deadline, completed: false }
-        ])
-        setName('')
-        setDeadline(undefined)
+        axios.post('/api/todo', {
+          name,
+          deadline,
+          completed: false
+        }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }).then(resp => {
+          setTodos([
+            ...todos,
+            { id: resp.data.id, name, deadline, completed: false }
+          ])
+          setName('')
+          setDeadline(undefined)
+          messageApi.success('添加成功')
+        }).catch(err => {
+          messageApi.error(err.response.data.message)
+        })
       } else {
         messageApi.error('请填写任务名称和截止时间')
       }
     }
   }
 
-  const deleteTodo = (id: number) => {
+  const editTodo = (id: string, completed: boolean) => {
     if (todos) {
-      const newTodos = todos.filter(todo => todo.id !== id)
-      setTodos(newTodos)
+      axios.put(`/api/todo/${id}`, { completed }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      }).then(() => {
+        const newTodos = todos.map(todo => {
+          if (todo.id === id) todo.completed = completed
+          return todo
+        })
+        setTodos(newTodos)
+        messageApi.success('修改成功')
+      }).catch(err => {
+        messageApi.error(err.response.data.message)
+      })
     }
   }
 
-  const editTodo = (id: number, completed: boolean) => {
+  const deleteTodo = (id: string) => {
     if (todos) {
-      const newTodos = todos.map(todo => {
-        if (todo.id === id) todo.completed = completed
-        return todo
+      axios.delete(`/api/todo/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      }).then(() => {
+        const newTodos = todos.filter(todo => todo.id !== id)
+        setTodos(newTodos)
+        messageApi.success('删除成功')
+      }).catch(err => {
+        messageApi.error(err.response.data.message)
       })
-      setTodos(newTodos)
     }
   }
 
@@ -77,6 +120,7 @@ function TodoList () {
           <List.Item
             actions={[
               <Checkbox
+                defaultChecked={todo.completed}
                 onChange={e => {
                   editTodo(todo.id, e.target.checked)
                 }}
@@ -89,9 +133,8 @@ function TodoList () {
             ]}
           >
             <div
-              className={`todo ${todo.completed ? 'completed' : ''} ${
-                new Date(todo.deadline) < new Date() ? 'overdue' : ''
-              }`}
+              className={`todo ${todo.completed ? 'completed' : ''} ${new Date(todo.deadline) < new Date() ? 'overdue' : ''
+                }`}
             >
               <div>{todo.name}</div>
               <div>截止时间：{dayjs(todo.deadline).format('YYYY-MM-DD')}</div>
