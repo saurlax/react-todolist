@@ -1,9 +1,10 @@
-import { Button, Checkbox, DatePicker, Input, List, message } from 'antd'
+import { Button, Checkbox, DatePicker, Input, List, message, Space } from 'antd'
 import { useEffect, useState } from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import './TodoList.css'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 interface Todo {
   id: string
@@ -17,6 +18,7 @@ function TodoList() {
   const [deadline, setDeadline] = useState<number>()
   const [todos, setTodos] = useState<Todo[]>([])
   const [messageApi, contextHolder] = message.useMessage()
+  const navigate = useNavigate()
 
   useEffect(() => {
     axios.get('/api/todos', {
@@ -26,7 +28,11 @@ function TodoList() {
     }).then(res => {
       setTodos(res.data)
     }).catch(err => {
-      messageApi.error(err.response.data.message)
+      if (err.response.status === 401) {
+        logout()
+      } else {
+        messageApi.error(err.response.data.message)
+      }
     })
   }, [])
 
@@ -93,6 +99,11 @@ function TodoList() {
     }
   }
 
+  const logout = () => {
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
+
   return (
     <div className='todolist'>
       {contextHolder}
@@ -103,16 +114,17 @@ function TodoList() {
           value={name}
           onChange={e => setName(e.target.value)}
         />
-        <DatePicker
-          placeholder='选择截止时间'
-          value={deadline ? dayjs(deadline) : null}
-          onChange={date => {
-            setDeadline(date?.valueOf())
-          }}
-        />
-        <Button type='primary' onClick={addTodo}>
-          添加
-        </Button>
+        <Space>
+          <DatePicker
+            placeholder='选择截止时间'
+            value={deadline ? dayjs(deadline) : null}
+            onChange={date => {
+              setDeadline(date?.valueOf())
+            }}
+          />
+          <Button type='primary' onClick={addTodo}>添加</Button>
+          <Button danger onClick={logout}>退出登录</Button>
+        </Space>
       </div>
       <List
         dataSource={todos}
