@@ -17,8 +17,7 @@
     "dayjs": "^1.11.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.24.1",
-    "ts-node": "^10.9.2"
+    "react-router-dom": "^6.24.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
