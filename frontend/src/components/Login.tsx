@@ -11,7 +11,26 @@ function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
+  const validate = () => {
+    const usernameRegex = /^[a-zA-Z0-9]+$/
+    const passwordRegex = /^.{8,}$/
+
+    if (!usernameRegex.test(username)) {
+      messageApi.error('账号只能包含字母和数字')
+      return false
+    }
+
+    if (!passwordRegex.test(password)) {
+      messageApi.error('密码至少8位')
+      return false
+    }
+
+    return true
+  }
+
   const loginUser = () => {
+    if (!validate()) return
+
     const payload = {
       username: crypto.SHA256(username).toString(),
       password: crypto.SHA256(password).toString()
@@ -28,6 +47,8 @@ function Login() {
   }
 
   const registerUser = () => {
+    if (!validate()) return
+
     const payload = {
       username: crypto.SHA256(username).toString(),
       password: crypto.SHA256(password).toString()
